@@ -26,6 +26,10 @@ function getCookie(name) {
 }
 
 API.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Token ${token}`;
+  }
   const csrftoken = getCookie('csrftoken');
   if (csrftoken) {
     config.headers['X-CSRFToken'] = csrftoken;
@@ -43,17 +47,27 @@ export const getCurrentUser = async () => {
 
 export const loginUser = async (username, password) => {
   const response = await API.post('/auth/login/', { username, password });
+  if (response.data?.token) {
+    localStorage.setItem('token', response.data.token);
+  }
   return response.data;
 };
 
 export const registerUser = async (username, password, email = '') => {
   const response = await API.post('/auth/register/', { username, password, email });
+  if (response.data?.token) {
+    localStorage.setItem('token', response.data.token);
+  }
   return response.data;
 };
 
 export const logoutUser = async () => {
-  const response = await API.post('/auth/logout/');
-  return response.data;
+  try {
+    const response = await API.post('/auth/logout/');
+    return response.data;
+  } finally {
+    localStorage.removeItem('token');
+  }
 };
 
 // Media endpoints

@@ -80,6 +80,9 @@ class StatsView(APIView):
         })
 
 
+from rest_framework.authtoken.models import Token
+
+
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 @authentication_classes([])
@@ -87,9 +90,14 @@ def register_api(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-        login(request, user)
+        try:
+            login(request, user)
+        except Exception:
+            pass
+        token, _ = Token.objects.get_or_create(user=user)
         return Response({
             'message': 'Registration successful',
+            'token': token.key,
             'user': UserSerializer(user).data
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -107,12 +115,18 @@ def login_api(request):
 
     user = authenticate(request, username=username, password=password)
     if user is not None:
-        login(request, user)
+        try:
+            login(request, user)
+        except Exception:
+            pass
+        token, _ = Token.objects.get_or_create(user=user)
         return Response({
             'message': 'Login successful',
+            'token': token.key,
             'user': UserSerializer(user).data
         })
     return Response({'detail': 'Invalid username or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 
