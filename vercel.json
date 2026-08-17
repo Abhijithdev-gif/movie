@@ -1,11 +1,17 @@
 {
+  "version": 2,
   "builds": [
     {
-      "src": "your_project_name/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb" }
+      "src": "api/wsgi.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
-  ],
   "routes": [
     {
       "src": "/(.*)",
