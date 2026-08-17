@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Avg, Q
@@ -82,6 +82,7 @@ class StatsView(APIView):
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
+@authentication_classes([])
 def register_api(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
@@ -96,6 +97,7 @@ def register_api(request):
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
+@authentication_classes([])
 def login_api(request):
     username = request.data.get('username')
     password = request.data.get('password')
@@ -111,6 +113,7 @@ def login_api(request):
             'user': UserSerializer(user).data
         })
     return Response({'detail': 'Invalid username or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 @api_view(['POST'])

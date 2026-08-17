@@ -29,11 +29,24 @@ const Login = ({ onLoginSuccess }) => {
         onLoginSuccess(res.user);
       }
     } catch (err) {
-      setError(
-        err.response?.data?.detail ||
-        err.response?.data?.username?.[0] ||
-        'Authentication failed. Please check your credentials.'
-      );
+      const data = err.response?.data;
+      let errMsg = 'Authentication failed. Please check your credentials.';
+
+      if (typeof data === 'string') {
+        errMsg = data;
+      } else if (data?.detail) {
+        errMsg = data.detail;
+      } else if (data?.username) {
+        errMsg = Array.isArray(data.username) ? data.username[0] : data.username;
+      } else if (data?.password) {
+        errMsg = Array.isArray(data.password) ? data.password[0] : data.password;
+      } else if (data?.non_field_errors) {
+        errMsg = Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : data.non_field_errors;
+      } else if (err.message) {
+        errMsg = err.message;
+      }
+
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
