@@ -81,19 +81,25 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-if os.environ.get('VERCEL') == '1':
-    # Vercel serverless environment: writable storage is in /tmp
+if os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_ENV'):
+    # Vercel serverless environment: writable storage MUST be in /tmp
     db_tmp = Path('/tmp/db.sqlite3')
     original_db = BASE_DIR / 'db.sqlite3'
-    if not db_tmp.exists() and original_db.exists():
-        try:
-            shutil.copy2(original_db, db_tmp)
-        except Exception:
-            pass
+    if not db_tmp.exists():
+        if original_db.exists():
+            try:
+                shutil.copy2(original_db, db_tmp)
+            except Exception:
+                pass
+        if not db_tmp.exists():
+            try:
+                db_tmp.touch()
+            except Exception:
+                pass
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': db_tmp if db_tmp.exists() else original_db,
+            'NAME': db_tmp,
         }
     }
 else:
