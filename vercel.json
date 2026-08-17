@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/wsgi.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     },
     {
@@ -16,14 +16,14 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/wsgi.py"
+      "dest": "/api/index.py"
     },
     {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/frontend/dist/index.html"
+      "dest": "/index.html"
     }
   ]
 }
