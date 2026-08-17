@@ -12,6 +12,7 @@
         "distDir": "dist"
       }
     }
+  ],
   "routes": [
     {
       "src": "/(.*)",
